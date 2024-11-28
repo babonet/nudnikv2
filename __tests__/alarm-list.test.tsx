@@ -42,7 +42,6 @@ describe('AlarmList', () => {
   const mockOnDeleteAlarm = jest.fn();
   beforeEach(() => {
     jest.clearAllMocks();
-    (AsyncStorage.getItem as jest.Mock).mockResolvedValue(null);
   });
 
   it('renders empty state when no alarms', () => {

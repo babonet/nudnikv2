@@ -7,13 +7,14 @@ import { AlarmList } from './components/alarm-list';
 import { AlarmEditScreen } from './screens/alarm-edit';
 import { AlarmProvider, useAlarms } from './context/alarm-context';
 import { Alarm } from './types/alarm';
-import { format } from 'date-fns';
 import * as Notifications from 'expo-notifications';
 import { useEffect } from 'react';
+import  TaskCompletionScreen  from './screens/TaskCompletionScreen';
 
 type RootStackParamList = {
   Home: undefined;
   AlarmEdit: { alarm?: Alarm };
+  TaskCompletion: { alarm: Alarm };
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -28,6 +29,15 @@ const HomeScreen = ({ navigation }: { navigation: any }) => {
       },
     });
   };
+
+  useEffect(() => {
+    const subscription = Notifications.addNotificationResponseReceivedListener(response => {
+      const alarm = response.notification.request.content.data.alarm;
+      navigation.navigate('TaskCompletion', { alarm });
+    });
+
+    return () => subscription.remove();
+  }, []);
 
   return (
     <View style={styles.container}>
@@ -72,6 +82,11 @@ const Navigation = () => {
         options={({ route }) => ({
           title: route.params?.alarm ? 'Edit Alarm' : 'New Alarm',
         })}
+      />
+      <Stack.Screen
+        name="TaskCompletion"
+        component={TaskCompletionScreen}
+        options={{ title: 'Complete Task' }}
       />
     </Stack.Navigator>
   );

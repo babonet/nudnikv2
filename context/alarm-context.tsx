@@ -43,12 +43,13 @@ export const AlarmProvider = ({ children }: { children: React.ReactNode }) => {
 
   const scheduleNotification = async (alarm: Alarm) => {
     const trigger = new Date(alarm.time);
-    trigger.setSeconds(0); // Ensure seconds are zero
+    trigger.setSeconds(0);
 
     await Notifications.scheduleNotificationAsync({
       content: {
         title: "Alarm",
         body: `It's time for your alarm set at ${trigger.toLocaleTimeString()}`,
+        data: { alarm },
       },
       trigger,
     });
