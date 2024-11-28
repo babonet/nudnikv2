@@ -1,12 +1,82 @@
+import { NavigationContainer } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View, Pressable } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import { AlarmList } from './components/alarm-list';
+import { AlarmEditScreen } from './screens/alarm-edit';
+import { AlarmProvider, useAlarms } from './context/alarm-context';
+import { Alarm } from './types/alarm';
+
+type RootStackParamList = {
+  Home: undefined;
+  AlarmEdit: { alarm?: Alarm };
+};
+
+const Stack = createNativeStackNavigator<RootStackParamList>();
+
+const HomeScreen = ({ navigation }: { navigation: any }) => {
+  const { alarms, toggleAlarm, deleteAlarm } = useAlarms();
+
+  const handlePressAlarm = (alarm: Alarm) => {
+    navigation.navigate('AlarmEdit', { alarm });
+  };
+
+  return (
+    <View style={styles.container}>
+      <StatusBar style="auto" />
+      <AlarmList
+        alarms={alarms}
+        onToggleAlarm={toggleAlarm}
+        onPressAlarm={handlePressAlarm}
+        onDeleteAlarm={deleteAlarm}
+      />
+    </View>
+  );
+};
+
+const Navigation = () => {
+  return (
+    <Stack.Navigator>
+      <Stack.Screen 
+        name="Home" 
+        component={HomeScreen}
+        options={({ navigation }) => ({
+          title: 'Nudnik',
+          headerRight: () => (
+            <Pressable
+              onPress={() => navigation.navigate({
+                name: 'AlarmEdit',
+                params: {}
+              })}
+              style={({ pressed }) => ({
+                opacity: pressed ? 0.5 : 1,
+                padding: 8,
+              })}
+            >
+              <Ionicons name="add" size={24} color="#007AFF" />
+            </Pressable>
+          ),
+        })}
+      />
+      <Stack.Screen
+        name="AlarmEdit"
+        component={AlarmEditScreen}
+        options={({ route }) => ({
+          title: route.params?.alarm ? 'Edit Alarm' : 'New Alarm',
+        })}
+      />
+    </Stack.Navigator>
+  );
+};
 
 export default function App() {
   return (
-    <View style={styles.container}>
-      <Text>Open up App.tsx to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
+    <NavigationContainer>
+      <AlarmProvider>
+        <Navigation />
+      </AlarmProvider>
+    </NavigationContainer>
   );
 }
 
@@ -14,7 +84,5 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
   },
 });
