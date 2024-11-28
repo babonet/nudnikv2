@@ -24,4 +24,5 @@ export interface Alarm {
   };
   snoozeEnabled: boolean;
   snoozeDuration: number;
+  name?: string;
 } 

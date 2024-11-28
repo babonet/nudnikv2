@@ -32,6 +32,7 @@ export const AlarmItem = ({ alarm, onToggle, onPress, onDelete }: AlarmItemProps
       testID="alarm-item"
     >
       <View style={styles.timeContainer}>
+        {alarm.name && <Text style={styles.name}>{alarm.name}</Text>}
         <Text style={styles.time}>
           {format(time, 'HH:mm')}
         </Text>
@@ -110,5 +111,10 @@ const styles = StyleSheet.create({
   deleteButton: {
     padding: 8,
     marginLeft: 8,
-  }
+  },
+  name: {
+    fontSize: 16,
+    fontWeight: '600',
+    marginBottom: 4,
+  },
 }); 

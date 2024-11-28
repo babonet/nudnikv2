@@ -42,17 +42,28 @@ export const AlarmProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   const scheduleNotification = async (alarm: Alarm) => {
+    console.debug(`[Alarm] Attempting to schedule notification for alarm: ${alarm.id}`);
+
+    if (!alarm.enabled) {
+      console.debug(`[Alarm] Notification not scheduled for disabled alarm: ${alarm.id}`);
+      return;
+    }
+
     const trigger = new Date(alarm.time);
     trigger.setSeconds(0);
 
+    console.debug(`[Alarm] Scheduling notification for alarm: ${alarm.id} at ${trigger.toLocaleTimeString()}`);
+
     await Notifications.scheduleNotificationAsync({
       content: {
-        title: "Alarm",
+        title: alarm.name ? `Alarm: ${alarm.name}` : "Alarm",
         body: `It's time for your alarm set at ${trigger.toLocaleTimeString()}`,
         data: { alarm },
       },
       trigger,
     });
+
+    console.debug(`[Alarm] Notification successfully scheduled for alarm: ${alarm.id}`);
   };
 
   const addAlarm = useCallback((newAlarm: Omit<Alarm, 'id'>) => {
@@ -93,9 +104,20 @@ export const AlarmProvider = ({ children }: { children: React.ReactNode }) => {
   const toggleAlarm = useCallback((id: string, enabled: boolean) => {
     setAlarms(current => {
       const updated = current.map(alarm =>
-        alarm.id === id ? { ...alarm, isEnabled: enabled } : alarm
+        alarm.id === id ? { ...alarm, enabled } : alarm
       );
       saveAlarms(updated);
+
+      const alarm = updated.find(alarm => alarm.id === id);
+      if (alarm) {
+        if (enabled) {
+          scheduleNotification(alarm); // Schedule if enabled
+        } else {
+          Notifications.cancelScheduledNotificationAsync(alarm.id); // Cancel if disabled
+          console.debug(`[Alarm] Notification canceled for alarm: ${alarm.id}`);
+        }
+      }
+
       return updated;
     });
   }, []);

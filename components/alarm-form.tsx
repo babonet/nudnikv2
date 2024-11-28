@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, ScrollView, Text, Switch, Pressable, Platform } from 'react-native';
+import { View, StyleSheet, ScrollView, Text, Switch, Pressable, Platform, TextInput } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { Alarm, TaskType } from '../types/alarm';
 
@@ -19,6 +19,7 @@ export const AlarmForm = ({ alarm, onSave, onCancel }: AlarmFormProps) => {
   );
   const [taskType, setTaskType] = useState<TaskType>(alarm?.task.type || 'none');
   const [snoozeEnabled, setSnoozeEnabled] = useState<boolean>(alarm?.snoozeEnabled ?? true);
+  const [name, setName] = useState(alarm?.name || '');
 
   const handleTimeChange = (event: any, selectedDate?: Date) => {
     setShowTimePicker(false);
@@ -41,6 +42,7 @@ export const AlarmForm = ({ alarm, onSave, onCancel }: AlarmFormProps) => {
 
   const handleSave = () => {
     onSave({
+      name,
       time: date,
       recurrence: { days: selectedDays },
       task: { type: taskType },
@@ -125,6 +127,15 @@ export const AlarmForm = ({ alarm, onSave, onCancel }: AlarmFormProps) => {
           <Text style={styles.label}>Allow Snooze</Text>
           <Switch value={snoozeEnabled} onValueChange={setSnoozeEnabled} />
         </View>
+      </View>
+
+      <View style={styles.section}>
+        <TextInput
+          placeholder="Alarm Name"
+          value={name}
+          onChangeText={setName}
+          style={styles.input}
+        />
       </View>
 
       <View style={styles.buttonContainer}>
@@ -236,5 +247,11 @@ const styles = StyleSheet.create({
   },
   dayButtonTextSelected: {
     color: '#fff',
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: '#f0f0f0',
+    padding: 8,
+    borderRadius: 8,
   },
 }); 
