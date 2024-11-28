@@ -7,6 +7,9 @@ import { AlarmList } from './components/alarm-list';
 import { AlarmEditScreen } from './screens/alarm-edit';
 import { AlarmProvider, useAlarms } from './context/alarm-context';
 import { Alarm } from './types/alarm';
+import { format } from 'date-fns';
+import * as Notifications from 'expo-notifications';
+import { useEffect } from 'react';
 
 type RootStackParamList = {
   Home: undefined;
@@ -19,7 +22,11 @@ const HomeScreen = ({ navigation }: { navigation: any }) => {
   const { alarms, toggleAlarm, deleteAlarm } = useAlarms();
 
   const handlePressAlarm = (alarm: Alarm) => {
-    navigation.navigate('AlarmEdit', { alarm });
+    navigation.navigate('AlarmEdit', {
+      alarm: {
+        ...alarm,
+      },
+    });
   };
 
   return (
@@ -71,6 +78,25 @@ const Navigation = () => {
 };
 
 export default function App() {
+  Notifications.setNotificationHandler({
+    handleNotification: async () => ({
+      shouldShowAlert: true,
+      shouldPlaySound: true,
+      shouldSetBadge: false,
+    }),
+  });
+
+  useEffect(() => {
+    const requestPermissions = async () => {
+      const { status } = await Notifications.requestPermissionsAsync();
+      if (status !== 'granted') {
+        alert('Permission for notifications not granted!');
+      }
+    };
+
+    requestPermissions();
+  }, []);
+
   return (
     <NavigationContainer>
       <AlarmProvider>

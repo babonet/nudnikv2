@@ -41,12 +41,10 @@ export const AlarmForm = ({ alarm, onSave, onCancel }: AlarmFormProps) => {
 
   const handleSave = () => {
     onSave({
-      time: date.toISOString(),
-      recurrence: { 
-        days: selectedDays
-      },
+      time: date,
+      recurrence: { days: selectedDays },
       task: { type: taskType },
-      isEnabled: true,
+      enabled: true,
       snoozeEnabled,
       snoozeDuration: 5,
     });

@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet, Switch, Pressable } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Alarm } from '../types/alarm';
-import { format, parseISO } from 'date-fns';
+import { format } from 'date-fns';
 
 interface AlarmItemProps {
   alarm: Alarm;
@@ -12,7 +12,7 @@ interface AlarmItemProps {
 }
 
 export const AlarmItem = ({ alarm, onToggle, onPress, onDelete }: AlarmItemProps) => {
-  const { time, recurrence, task, isEnabled } = alarm;
+  const { time, recurrence, task, enabled } = alarm;
 
   const getRecurrenceText = () => {
     if (recurrence.days.length === 7) return 'Every day';
@@ -24,8 +24,6 @@ export const AlarmItem = ({ alarm, onToggle, onPress, onDelete }: AlarmItemProps
       .map(day => ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][day])
       .join(', ');
   };
-
-  const timeDate = parseISO(time);
 
   return (
     <Pressable 
@@ -48,7 +46,7 @@ export const AlarmItem = ({ alarm, onToggle, onPress, onDelete }: AlarmItemProps
         )}
         <Switch
           testID="alarm-switch"
-          value={isEnabled}
+          value={enabled}
           onValueChange={(value) => onToggle(alarm.id, value)}
         />
         <Pressable 

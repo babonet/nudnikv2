@@ -18,3 +18,10 @@ jest.mock('@react-navigation/native', () => ({
     goBack: jest.fn(),
   }),
 }));
+
+jest.mock('@react-native-async-storage/async-storage', () => ({
+  setItem: jest.fn((key: string, value: string) => Promise.resolve()),
+  getItem: jest.fn((key: string) => Promise.resolve(null)),
+  removeItem: jest.fn((key: string) => Promise.resolve()),
+  clear: jest.fn(() => Promise.resolve()),
+}));

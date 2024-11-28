@@ -1,12 +1,14 @@
-import React, { createContext, useContext, useState, useCallback } from 'react';
+import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
 import 'react-native-get-random-values';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Alarm } from '../types/alarm';
 import { v4 as uuidv4 } from 'uuid';
+import * as Notifications from 'expo-notifications';
 
 interface AlarmContextType {
   alarms: Alarm[];
-  addAlarm: (alarm: Omit<Alarm, 'id' | 'nextOccurrence'>) => void;
-  updateAlarm: (id: string, alarm: Omit<Alarm, 'id' | 'nextOccurrence'>) => void;
+  addAlarm: (alarm: Omit<Alarm, 'id'>) => void;
+  updateAlarm: (id: string, alarm: Omit<Alarm, 'id'>) => void;
   toggleAlarm: (id: string, enabled: boolean) => void;
   deleteAlarm: (id: string) => void;
 }
@@ -16,63 +18,91 @@ const AlarmContext = createContext<AlarmContextType | undefined>(undefined);
 export const AlarmProvider = ({ children }: { children: React.ReactNode }) => {
   const [alarms, setAlarms] = useState<Alarm[]>([]);
 
-  const addAlarm = useCallback((newAlarm: Omit<Alarm, 'id' | 'nextOccurrence'>) => {
+  useEffect(() => {
+    loadAlarms();
+  }, []);
+
+  const loadAlarms = async () => {
+    try {
+      const storedAlarms = await AsyncStorage.getItem('alarms');
+      if (storedAlarms) {
+        setAlarms(JSON.parse(storedAlarms));
+      }
+    } catch (error) {
+      console.error('Error loading alarms:', error);
+    }
+  };
+
+  const saveAlarms = async (updatedAlarms: Alarm[]) => {
+    try {
+      await AsyncStorage.setItem('alarms', JSON.stringify(updatedAlarms));
+    } catch (error) {
+      console.error('Error saving alarms:', error);
+    }
+  };
+
+  const scheduleNotification = async (alarm: Alarm) => {
+    const trigger = new Date(alarm.time);
+    trigger.setSeconds(0); // Ensure seconds are zero
+
+    await Notifications.scheduleNotificationAsync({
+      content: {
+        title: "Alarm",
+        body: `It's time for your alarm set at ${trigger.toLocaleTimeString()}`,
+      },
+      trigger,
+    });
+  };
+
+  const addAlarm = useCallback((newAlarm: Omit<Alarm, 'id'>) => {
     console.debug('[Alarm] Adding new alarm:', {
       time: newAlarm.time,
-      recurrence: newAlarm.recurrence,
-      task: newAlarm.task
+      enabled: newAlarm.enabled
     });
     
     const alarm: Alarm = {
       ...newAlarm,
       id: uuidv4(),
-      nextOccurrence: new Date().toISOString(),
+      time: new Date(newAlarm.time),
     };
     
     setAlarms(current => {
+      const updated = [...current, alarm];
+      saveAlarms(updated);
+      scheduleNotification(alarm); // Schedule notification
       console.debug('[Alarm] Successfully added alarm:', alarm.id);
-      return [...current, alarm];
+      return updated;
     });
   }, []);
 
-  const updateAlarm = useCallback((id: string, updatedAlarm: Omit<Alarm, 'id' | 'nextOccurrence'>) => {
-    console.debug('[Alarm] Updating alarm:', {
-      id,
-      updates: updatedAlarm
-    });
-    
+  const updateAlarm = useCallback((id: string, updatedAlarm: Omit<Alarm, 'id'>) => {
     setAlarms(current => {
       const updated = current.map(alarm =>
-        alarm.id === id
-          ? { ...alarm, ...updatedAlarm }
-          : alarm
+        alarm.id === id ? { ...alarm, ...updatedAlarm, time: new Date(updatedAlarm.time) } : alarm
       );
-      console.debug('[Alarm] Successfully updated alarm:', id);
+      saveAlarms(updated);
+      const alarm = updated.find(alarm => alarm.id === id);
+      if (alarm) {
+        scheduleNotification(alarm); // Reschedule notification
+      }
       return updated;
     });
   }, []);
 
   const toggleAlarm = useCallback((id: string, enabled: boolean) => {
-    console.debug('[Alarm] Toggling alarm:', {
-      id,
-      enabled
-    });
-    
     setAlarms(current => {
       const updated = current.map(alarm =>
         alarm.id === id ? { ...alarm, isEnabled: enabled } : alarm
       );
-      console.debug('[Alarm] Successfully toggled alarm:', id);
+      saveAlarms(updated);
       return updated;
     });
   }, []);
 
   const deleteAlarm = useCallback((id: string) => {
-    console.debug('[Alarm] Deleting alarm:', id);
-    
     setAlarms(current => {
       const updated = current.filter(alarm => alarm.id !== id);
-      console.debug('[Alarm] Successfully deleted alarm:', id);
+      saveAlarms(updated);
       return updated;
     });
   }, []);

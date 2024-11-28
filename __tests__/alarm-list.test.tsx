@@ -3,23 +3,13 @@ import { render } from '@testing-library/react-native';
 import { AlarmList } from '../components/alarm-list';
 import { Alarm } from '../types/alarm';
 import {expect, jest} from '@jest/globals';
-import { v4 as uuidv4 } from 'uuid';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-// Mock crypto for UUID generation
-const mockCrypto = {
-  getRandomValues: (arr: any) => {
-    for (let i = 0; i < arr.length; i++) {
-      arr[i] = Math.floor(Math.random() * 256);
-    }
-    return arr;
-  }
-};
-global.crypto = mockCrypto as unknown as Crypto;
 
 const mockAlarms: Alarm[] = [
   {
     id: '1',
-    time: '2024-01-01T08:00:00.000Z',
+    time: new Date('2024-01-01T08:00:00.000Z'),
     recurrence: {
       days: [1, 2, 3, 4, 5],
     },
@@ -27,24 +17,22 @@ const mockAlarms: Alarm[] = [
       type: 'math',
       difficulty: 'medium',
     },
-    isEnabled: true,
+    enabled: true,
     snoozeEnabled: true,
     snoozeDuration: 5,
-    nextOccurrence: '2024-01-01T08:00:00.000Z',
   },
   {
     id: '2',
-    time: '2024-01-01T09:00:00.000Z',
+    time: new Date('2024-01-01T09:00:00.000Z'),
     recurrence: {
       days: [1, 3, 5],
     },
     task: {
       type: 'qrCode',
     },
-    isEnabled: true,
+    enabled: true,
     snoozeEnabled: false,
     snoozeDuration: 10,
-    nextOccurrence: '2024-01-01T09:00:00.000Z',
   },
 ];
 
@@ -54,6 +42,7 @@ describe('AlarmList', () => {
   const mockOnDeleteAlarm = jest.fn();
   beforeEach(() => {
     jest.clearAllMocks();
+    (AsyncStorage.getItem as jest.Mock).mockResolvedValue(null);
   });
 
   it('renders empty state when no alarms', () => {

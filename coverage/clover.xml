@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1732790101670" clover="3.2.0">
-  <project timestamp="1732790101670" name="All files">
-    <metrics statements="114" coveredstatements="78" conditionals="52" coveredconditionals="33" methods="46" coveredmethods="31" elements="212" coveredelements="142" complexity="0" loc="114" ncloc="114" packages="5" files="9" classes="9"/>
+<coverage generated="1732798629427" clover="3.2.0">
+  <project timestamp="1732798629427" name="All files">
+    <metrics statements="115" coveredstatements="79" conditionals="52" coveredconditionals="33" methods="47" coveredmethods="32" elements="214" coveredelements="144" complexity="0" loc="115" ncloc="115" packages="5" files="9" classes="9"/>
     <package name="nudnik">
       <metrics statements="17" coveredstatements="0" conditionals="4" coveredconditionals="0" methods="9" coveredmethods="0"/>
       <file name="App.tsx" path="C:\Users\maozo\Source\Specs\nudnik\App.tsx">
@@ -12,15 +12,15 @@
         <line num="21" count="0" type="stmt"/>
         <line num="22" count="0" type="stmt"/>
         <line num="25" count="0" type="stmt"/>
-        <line num="37" count="0" type="stmt"/>
         <line num="38" count="0" type="stmt"/>
-        <line num="43" count="0" type="stmt"/>
-        <line num="46" count="0" type="stmt"/>
+        <line num="39" count="0" type="stmt"/>
+        <line num="44" count="0" type="stmt"/>
         <line num="47" count="0" type="stmt"/>
-        <line num="51" count="0" type="stmt"/>
-        <line num="64" count="0" type="stmt"/>
-        <line num="73" count="0" type="stmt"/>
-        <line num="82" count="0" type="stmt"/>
+        <line num="48" count="0" type="stmt"/>
+        <line num="52" count="0" type="stmt"/>
+        <line num="65" count="0" type="stmt"/>
+        <line num="74" count="0" type="stmt"/>
+        <line num="83" count="0" type="stmt"/>
       </file>
       <file name="index.ts" path="C:\Users\maozo\Source\Specs\nudnik\index.ts">
         <metrics statements="1" coveredstatements="0" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
@@ -32,7 +32,7 @@
       </file>
     </package>
     <package name="nudnik.components">
-      <metrics statements="50" coveredstatements="44" conditionals="38" coveredconditionals="30" methods="21" coveredmethods="18"/>
+      <metrics statements="51" coveredstatements="45" conditionals="38" coveredconditionals="30" methods="22" coveredmethods="19"/>
       <file name="alarm-form.tsx" path="C:\Users\maozo\Source\Specs\nudnik\components\alarm-form.tsx">
         <metrics statements="29" coveredstatements="23" conditionals="26" coveredconditionals="18" methods="12" coveredmethods="9"/>
         <line num="12" count="1" type="stmt"/>
@@ -66,31 +66,32 @@
         <line num="144" count="1" type="stmt"/>
       </file>
       <file name="alarm-item.tsx" path="C:\Users\maozo\Source\Specs\nudnik\components\alarm-item.tsx">
-        <metrics statements="14" coveredstatements="14" conditionals="10" coveredconditionals="10" methods="6" coveredmethods="6"/>
-        <line num="12" count="2" type="stmt"/>
-        <line num="13" count="13" type="stmt"/>
-        <line num="15" count="13" type="stmt"/>
-        <line num="16" count="13" type="cond" truecount="2" falsecount="0"/>
-        <line num="17" count="12" type="cond" truecount="4" falsecount="0"/>
-        <line num="18" count="40" type="cond" truecount="2" falsecount="0"/>
-        <line num="19" count="8" type="stmt"/>
-        <line num="21" count="4" type="stmt"/>
-        <line num="22" count="12" type="stmt"/>
-        <line num="26" count="13" type="stmt"/>
-        <line num="28" count="13" type="stmt"/>
-        <line num="31" count="1" type="stmt"/>
-        <line num="50" count="1" type="stmt"/>
-        <line num="57" count="2" type="stmt"/>
+        <metrics statements="15" coveredstatements="15" conditionals="10" coveredconditionals="10" methods="7" coveredmethods="7"/>
+        <line num="14" count="2" type="stmt"/>
+        <line num="15" count="14" type="stmt"/>
+        <line num="17" count="14" type="stmt"/>
+        <line num="18" count="14" type="cond" truecount="2" falsecount="0"/>
+        <line num="19" count="13" type="cond" truecount="4" falsecount="0"/>
+        <line num="20" count="45" type="cond" truecount="2" falsecount="0"/>
+        <line num="21" count="9" type="stmt"/>
+        <line num="23" count="4" type="stmt"/>
+        <line num="24" count="12" type="stmt"/>
+        <line num="28" count="14" type="stmt"/>
+        <line num="30" count="14" type="stmt"/>
+        <line num="33" count="1" type="stmt"/>
+        <line num="52" count="1" type="stmt"/>
+        <line num="55" count="1" type="stmt"/>
+        <line num="66" count="2" type="stmt"/>
       </file>
       <file name="alarm-list.tsx" path="C:\Users\maozo\Source\Specs\nudnik\components\alarm-list.tsx">
         <metrics statements="7" coveredstatements="7" conditionals="2" coveredconditionals="2" methods="3" coveredmethods="3"/>
-        <line num="12" count="1" type="stmt"/>
-        <line num="13" count="4" type="cond" truecount="2" falsecount="0"/>
-        <line num="14" count="1" type="stmt"/>
-        <line num="22" count="3" type="stmt"/>
-        <line num="25" count="9" type="stmt"/>
-        <line num="27" count="6" type="stmt"/>
-        <line num="38" count="1" type="stmt"/>
+        <line num="13" count="1" type="stmt"/>
+        <line num="14" count="4" type="cond" truecount="2" falsecount="0"/>
+        <line num="15" count="1" type="stmt"/>
+        <line num="23" count="3" type="stmt"/>
+        <line num="26" count="9" type="stmt"/>
+        <line num="28" count="6" type="stmt"/>
+        <line num="40" count="1" type="stmt"/>
       </file>
     </package>
     <package name="nudnik.context">

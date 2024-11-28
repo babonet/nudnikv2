@@ -13,11 +13,15 @@ export interface RecurrencePattern {
 
 export interface Alarm {
   id: string;
-  time: string;
-  recurrence: RecurrencePattern;
-  task: TaskConfiguration;
-  isEnabled: boolean;
+  time: Date;
+  enabled: boolean;
+  recurrence: {
+    days: number[];
+  };
+  task: {
+    type: TaskType;
+    difficulty?: 'easy' | 'medium' | 'hard';
+  };
   snoozeEnabled: boolean;
-  snoozeDuration: number; // in minutes
-  nextOccurrence: string;
+  snoozeDuration: number;
 } 

@@ -5,7 +5,7 @@ import { Alarm } from '../types/alarm';
 
 const mockAlarm: Alarm = {
   id: '1',
-  time: new Date('2024-01-01T08:00:00.000Z').toISOString(),
+  time: new Date('2024-01-01T08:00:00.000Z'),
   recurrence: {
     days: [1, 2, 3, 4, 5], // Monday to Friday
   },
@@ -13,10 +13,9 @@ const mockAlarm: Alarm = {
     type: 'math',
     difficulty: 'medium',
   },
-  isEnabled: true,
+  enabled: true,
   snoozeEnabled: true,
   snoozeDuration: 5,
-  nextOccurrence: '2024-01-01T08:00:00.000Z',
 };
 
 describe('AlarmItem', () => {

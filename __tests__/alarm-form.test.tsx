@@ -5,13 +5,12 @@ import { Alarm } from '../types/alarm';
 
 const mockAlarm: Alarm = {
   id: '1',
-  time: '2024-01-01T08:00:00.000Z',
+  time: new Date('2024-01-01T08:00:00.000Z'),
   recurrence: { days: [1, 2, 3, 4, 5] },
   task: { type: 'math' },
-  isEnabled: true,
+  enabled: true,
   snoozeEnabled: true,
   snoozeDuration: 5,
-  nextOccurrence: '2024-01-01T08:00:00.000Z',
 };
 
 describe('AlarmForm', () => {
