@@ -10,6 +10,7 @@ interface AlarmFormProps {
 }
 
 const DAYS_OF_WEEK = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+const SNOOZE_PRESETS = [5, 10, 15];
 
 export const AlarmForm = ({ alarm, onSave, onCancel }: AlarmFormProps) => {
   const [date, setDate] = useState(new Date(alarm?.time || new Date()));
@@ -20,6 +21,8 @@ export const AlarmForm = ({ alarm, onSave, onCancel }: AlarmFormProps) => {
   const [taskType, setTaskType] = useState<TaskType>(alarm?.task.type || 'none');
   const [snoozeEnabled, setSnoozeEnabled] = useState<boolean>(alarm?.snoozeEnabled ?? true);
   const [name, setName] = useState(alarm?.name || '');
+  const [snoozeDuration, setSnoozeDuration] = useState<number>(alarm?.snoozeDuration ?? 5);
+  const [customDuration, setCustomDuration] = useState<string>('');
 
   const handleTimeChange = (event: any, selectedDate?: Date) => {
     setShowTimePicker(false);
@@ -28,16 +31,35 @@ export const AlarmForm = ({ alarm, onSave, onCancel }: AlarmFormProps) => {
     }
   };
 
+  const getDaysTitle = () => {
+    if (selectedDays.length === 0) return 'Once';
+    if (selectedDays.length === 7) return 'Every day';
+    if (selectedDays.length > 0 && selectedDays.length < 7) {
+      return `Every ${selectedDays.map(day => DAYS_OF_WEEK[day]).join(', ')}`;
+    }
+  };
+
   const handleDayToggle = (dayIndex: number) => {
     setSelectedDays(current => {
       if (current.includes(dayIndex)) {
-        // Don't allow removing the last day
-        if (current.length === 1) return current;
         return current.filter(d => d !== dayIndex);
       } else {
         return [...current, dayIndex].sort();
       }
     });
+  };
+
+  const handleCustomDuration = (text: string) => {
+    const duration = parseInt(text);
+    if (!text) {
+      setCustomDuration('');
+      return;
+    }
+    if (isNaN(duration) || duration < 1) {
+      return;
+    }
+    setCustomDuration(text);
+    setSnoozeDuration(Math.min(duration, 99));
   };
 
   const handleSave = () => {
@@ -48,7 +70,7 @@ export const AlarmForm = ({ alarm, onSave, onCancel }: AlarmFormProps) => {
       task: { type: taskType },
       enabled: true,
       snoozeEnabled,
-      snoozeDuration: 5,
+      snoozeDuration: snoozeDuration,
     });
   };
 
@@ -104,7 +126,7 @@ export const AlarmForm = ({ alarm, onSave, onCancel }: AlarmFormProps) => {
       </View>
 
       <View style={styles.section}>
-        <Text style={styles.label}>Repeat on</Text>
+        <Text style={styles.label}>{getDaysTitle()}</Text>
         <View style={styles.daysContainer}>
           {DAYS_OF_WEEK.map((day, index) => (
             <DayButton key={day} day={day} index={index} />
@@ -113,7 +135,16 @@ export const AlarmForm = ({ alarm, onSave, onCancel }: AlarmFormProps) => {
       </View>
 
       <View style={styles.section}>
-        <Text style={styles.label}>Wake-up Task</Text>
+        <TextInput
+          placeholder="Alarm Name"
+          value={name}
+          onChangeText={setName}
+          style={styles.input}
+        />
+      </View>
+      
+      <View style={styles.section}>
+        <Text style={styles.label}>Task</Text>
         <View style={styles.buttonGroup}>
           <TaskButton type="none" label="None" />
           <TaskButton type="math" label="Math" />
@@ -127,17 +158,45 @@ export const AlarmForm = ({ alarm, onSave, onCancel }: AlarmFormProps) => {
           <Text style={styles.label}>Allow Snooze</Text>
           <Switch value={snoozeEnabled} onValueChange={setSnoozeEnabled} />
         </View>
+        
+        {snoozeEnabled && (
+          <View style={styles.snoozeSettings}>
+            <Text style={styles.sublabel}>Snooze Duration (minutes)</Text>
+            <View style={styles.snoozeDurationContainer}>
+              {SNOOZE_PRESETS.map((duration) => (
+                <Pressable
+                  key={duration}
+                  style={[
+                    styles.durationButton,
+                    snoozeDuration === duration && styles.durationButtonSelected
+                  ]}
+                  onPress={() => {
+                    setSnoozeDuration(duration);
+                    setCustomDuration('');
+                  }}
+                >
+                  <Text style={[
+                    styles.durationButtonText,
+                    snoozeDuration === duration && styles.durationButtonTextSelected
+                  ]}>
+                    {duration}
+                  </Text>
+                </Pressable>
+              ))}
+              <View style={styles.customDurationContainer}>
+                <TextInput
+                  style={styles.customDurationInput}
+                  placeholder="Custom"
+                  value={customDuration}
+                  onChangeText={handleCustomDuration}
+                  keyboardType="number-pad"
+                  maxLength={2}
+                />
+              </View>
+            </View>
+          </View>
+        )}
       </View>
-
-      <View style={styles.section}>
-        <TextInput
-          placeholder="Alarm Name"
-          value={name}
-          onChangeText={setName}
-          style={styles.input}
-        />
-      </View>
-
       <View style={styles.buttonContainer}>
         <Pressable style={styles.saveButton} onPress={handleSave}>
           <Text style={styles.saveButtonText}>Save Alarm</Text>
@@ -253,5 +312,46 @@ const styles = StyleSheet.create({
     borderColor: '#f0f0f0',
     padding: 8,
     borderRadius: 8,
+  },
+  snoozeSettings: {
+    marginTop: 16,
+  },
+  sublabel: {
+    fontSize: 14,
+    color: '#666',
+    marginBottom: 8,
+  },
+  snoozeDurationContainer: {
+    flexDirection: 'row',
+    gap: 8,
+    alignItems: 'center',
+  },
+  durationButton: {
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 20,
+    backgroundColor: '#f0f0f0',
+    minWidth: 50,
+    alignItems: 'center',
+  },
+  durationButtonSelected: {
+    backgroundColor: '#007AFF',
+  },
+  durationButtonText: {
+    color: '#333',
+  },
+  durationButtonTextSelected: {
+    color: '#fff',
+  },
+  customDurationContainer: {
+    flex: 1,
+  },
+  customDurationInput: {
+    borderWidth: 1,
+    borderColor: '#f0f0f0',
+    borderRadius: 20,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    textAlign: 'center',
   },
 }); 

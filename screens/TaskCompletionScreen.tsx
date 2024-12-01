@@ -15,7 +15,7 @@ const TaskCompletionScreen = ({ route, navigation }: Props) => {
   const { alarm } = route.params;
 
   const handleSnooze = async () => {
-    const snoozeTime = new Date(Date.now() + 5 * 60 * 1000); // 5 minutes from now
+    const snoozeTime = new Date(Date.now() + alarm.snoozeDuration * 60 * 1000);
     
     await Notifications.scheduleNotificationAsync({
       content: {
@@ -25,7 +25,7 @@ const TaskCompletionScreen = ({ route, navigation }: Props) => {
       },
       trigger: snoozeTime,
     });
-    console.debug(`[Alarm] Snoozed alarm: ${alarm.id} for 5 minutes`);
+    console.debug(`[Alarm] Snoozed alarm: ${alarm.id} for ${alarm.snoozeDuration} minutes`);
     navigation.goBack();
   };
 

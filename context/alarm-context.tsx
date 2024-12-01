@@ -36,6 +36,13 @@ export const AlarmProvider = ({ children }: { children: React.ReactNode }) => {
   const saveAlarms = async (updatedAlarms: Alarm[]) => {
     try {
       await AsyncStorage.setItem('alarms', JSON.stringify(updatedAlarms));
+      console.debug('[Alarm] Saved alarms with snooze settings:', {
+        count: updatedAlarms.length,
+        snoozeDurations: updatedAlarms.map(a => ({
+          id: a.id,
+          duration: a.snoozeDuration
+        }))
+      });
     } catch (error) {
       console.error('Error saving alarms:', error);
     }
@@ -51,24 +58,32 @@ export const AlarmProvider = ({ children }: { children: React.ReactNode }) => {
 
     let trigger = new Date(alarm.time);
     const now = new Date();
-    const currentDay = now.getDay();
-    
-    // If time has already passed today, start checking from tomorrow
-    if (trigger <= now) {
-      trigger.setDate(trigger.getDate() + 1);
-      console.debug(`[Alarm] Time already passed today, checking tomorrow`);
-    }
 
-    // If the next trigger day isn't in selected days, find next valid day
-    if (!alarm.recurrence.days.includes(trigger.getDay())) {
-      const sortedDays = [...alarm.recurrence.days].sort((a, b) => a - b);
-      const nextDay = sortedDays.find(day => day > trigger.getDay()) ?? sortedDays[0];
-      const daysToAdd = nextDay > trigger.getDay() ? 
-        nextDay - trigger.getDay() : 
-        7 - trigger.getDay() + nextDay;
-      
-      trigger.setDate(trigger.getDate() + daysToAdd);
-      console.debug(`[Alarm] Adjusted to next valid day: ${trigger.toLocaleString()}`);
+    // If no days selected, set for nearest occurrence
+    if (alarm.recurrence.days.length === 0) {
+      if (trigger <= now) {
+        trigger.setDate(trigger.getDate() + 1);
+        console.debug(`[Alarm] One-time alarm: set for tomorrow as time has passed`);
+      } else {
+        console.debug(`[Alarm] One-time alarm: set for today`);
+      }
+    } else {
+      // Handle recurring alarms as before
+      if (trigger <= now) {
+        trigger.setDate(trigger.getDate() + 1);
+        console.debug(`[Alarm] Time already passed today, checking tomorrow`);
+      }
+
+      if (!alarm.recurrence.days.includes(trigger.getDay())) {
+        const sortedDays = [...alarm.recurrence.days].sort((a, b) => a - b);
+        const nextDay = sortedDays.find(day => day > trigger.getDay()) ?? sortedDays[0];
+        const daysToAdd = nextDay > trigger.getDay() ? 
+          nextDay - trigger.getDay() : 
+          7 - trigger.getDay() + nextDay;
+        
+        trigger.setDate(trigger.getDate() + daysToAdd);
+        console.debug(`[Alarm] Adjusted to next valid day: ${trigger.toLocaleString()}`);
+      }
     }
 
     console.debug(`[Alarm] Scheduling notification for: ${trigger.toLocaleString()}`);
