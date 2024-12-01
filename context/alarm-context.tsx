@@ -49,21 +49,38 @@ export const AlarmProvider = ({ children }: { children: React.ReactNode }) => {
       return;
     }
 
-    const trigger = new Date(alarm.time);
-    trigger.setSeconds(0);
+    let trigger = new Date(alarm.time);
+    const now = new Date();
+    const currentDay = now.getDay();
+    
+    // If time has already passed today, start checking from tomorrow
+    if (trigger <= now) {
+      trigger.setDate(trigger.getDate() + 1);
+      console.debug(`[Alarm] Time already passed today, checking tomorrow`);
+    }
 
-    console.debug(`[Alarm] Scheduling notification for alarm: ${alarm.id} at ${trigger.toLocaleTimeString()}`);
+    // If the next trigger day isn't in selected days, find next valid day
+    if (!alarm.recurrence.days.includes(trigger.getDay())) {
+      const sortedDays = [...alarm.recurrence.days].sort((a, b) => a - b);
+      const nextDay = sortedDays.find(day => day > trigger.getDay()) ?? sortedDays[0];
+      const daysToAdd = nextDay > trigger.getDay() ? 
+        nextDay - trigger.getDay() : 
+        7 - trigger.getDay() + nextDay;
+      
+      trigger.setDate(trigger.getDate() + daysToAdd);
+      console.debug(`[Alarm] Adjusted to next valid day: ${trigger.toLocaleString()}`);
+    }
+
+    console.debug(`[Alarm] Scheduling notification for: ${trigger.toLocaleString()}`);
 
     await Notifications.scheduleNotificationAsync({
       content: {
         title: alarm.name ? `Alarm: ${alarm.name}` : "Alarm",
-        body: `It's time for your alarm set at ${trigger.toLocaleTimeString()}`,
+        body: `It's time for your alarm!`,
         data: { alarm },
       },
       trigger,
     });
-
-    console.debug(`[Alarm] Notification successfully scheduled for alarm: ${alarm.id}`);
   };
 
   const addAlarm = useCallback((newAlarm: Omit<Alarm, 'id'>) => {
