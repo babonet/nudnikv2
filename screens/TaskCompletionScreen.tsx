@@ -1,8 +1,7 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, Button, StyleSheet } from 'react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { Alarm } from '../types/alarm';
-import MathTask from '../components/MathTask';
 
 type RootStackParamList = {
   TaskCompletion: { alarm: Alarm };
@@ -14,6 +13,8 @@ const TaskCompletionScreen = ({ route, navigation }: Props) => {
   const { alarm } = route.params;
 
   const handleCompleteTask = () => {
+    // Logic to verify task completion
+    // Navigate back or show success message
     navigation.goBack();
   };
 
@@ -24,7 +25,7 @@ const TaskCompletionScreen = ({ route, navigation }: Props) => {
       <Text style={styles.taskDescription}>
         Task: {alarm.task.type}
       </Text>
-      {alarm.task.type === 'math' && <MathTask onComplete={handleCompleteTask} />}
+      <Button title="Complete Task" onPress={handleCompleteTask} />
     </View>
   );
 };
