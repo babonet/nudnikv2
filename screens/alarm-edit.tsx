@@ -35,6 +35,7 @@ export const AlarmEditScreen = ({ route, navigation }: Props) => {
         alarm={alarm}
         onSave={handleSave}
         onCancel={handleCancel}
+        navigation={navigation}
       />
     </View>
   );

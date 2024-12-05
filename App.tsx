@@ -6,15 +6,25 @@ import { Ionicons } from '@expo/vector-icons';
 import { AlarmList } from './components/alarm-list';
 import { AlarmEditScreen } from './screens/alarm-edit';
 import { AlarmProvider, useAlarms } from './context/alarm-context';
-import { Alarm } from './types/alarm';
+import { Alarm, TaskType } from './types/alarm';
 import * as Notifications from 'expo-notifications';
 import { useEffect } from 'react';
 import  TaskCompletionScreen  from './screens/TaskCompletionScreen';
+import { TaskConfigScreen } from './screens/task-config';
+import { SnoozeConfigScreen } from './screens/snooze-config';
 
 type RootStackParamList = {
   Home: undefined;
   AlarmEdit: { alarm?: Alarm };
   TaskCompletion: { alarm: Alarm };
+  TaskConfig: {
+    taskType: TaskType;
+    onSave: (taskType: TaskType) => void;
+  };
+  SnoozeConfig: {
+    duration: number;
+    onSave: (duration: number) => void;
+  };
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -87,6 +97,16 @@ const Navigation = () => {
         name="TaskCompletion"
         component={TaskCompletionScreen}
         options={{ title: 'Complete Task' }}
+      />
+      <Stack.Screen 
+        name="TaskConfig" 
+        component={TaskConfigScreen}
+        options={{ title: 'Configure Task' }}
+      />
+      <Stack.Screen 
+        name="SnoozeConfig" 
+        component={SnoozeConfigScreen}
+        options={{ title: 'Snooze Duration' }}
       />
     </Stack.Navigator>
   );

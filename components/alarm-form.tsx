@@ -2,17 +2,19 @@ import React, { useState } from 'react';
 import { View, StyleSheet, ScrollView, Text, Switch, Pressable, Platform, TextInput } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { Alarm, TaskType } from '../types/alarm';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 
 interface AlarmFormProps {
   alarm?: Alarm;
   onSave: (alarm: Omit<Alarm, 'id' | 'nextOccurrence'>) => void;
   onCancel: () => void;
+  navigation: any;
 }
 
 const DAYS_OF_WEEK = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 const SNOOZE_PRESETS = [5, 10, 15];
 
-export const AlarmForm = ({ alarm, onSave, onCancel }: AlarmFormProps) => {
+export const AlarmForm = ({ alarm, onSave, onCancel, navigation }: AlarmFormProps) => {
   const [date, setDate] = useState(new Date(alarm?.time || new Date()));
   const [showTimePicker, setShowTimePicker] = useState(false);
   const [selectedDays, setSelectedDays] = useState<number[]>(
@@ -144,59 +146,63 @@ export const AlarmForm = ({ alarm, onSave, onCancel }: AlarmFormProps) => {
       </View>
       
       <View style={styles.section}>
-        <Text style={styles.label}>Task</Text>
-        <View style={styles.buttonGroup}>
-          <TaskButton type="none" label="None" />
-          <TaskButton type="math" label="Math" />
-          <TaskButton type="qrCode" label="QR Code" />
-          <TaskButton type="barCode" label="Barcode" />
-        </View>
+        <Pressable 
+          style={styles.taskRow}
+          onPress={() => {
+            if (!taskType || taskType === 'none') {
+              setTaskType('math');
+            } else {
+              navigation.navigate('TaskConfig', {
+                taskType,
+                onSave: (newTaskType: TaskType) => setTaskType(newTaskType)
+              });
+            }
+          }}
+        >
+          <View style={styles.taskTitleRow}>
+            <Text style={styles.label}>Task</Text>
+            {taskType && taskType !== 'none' && (
+              <Text style={styles.taskType}>
+                {taskType.charAt(0).toUpperCase() + taskType.slice(1)}
+              </Text>
+            )}
+            <Switch 
+              value={taskType !== 'none'} 
+              onValueChange={(enabled) => setTaskType(enabled ? 'math' : 'none')}
+              style={styles.switch}
+            />
+          </View>
+        </Pressable>
       </View>
 
       <View style={styles.section}>
-        <View style={styles.row}>
-          <Text style={styles.label}>Allow Snooze</Text>
-          <Switch value={snoozeEnabled} onValueChange={setSnoozeEnabled} />
-        </View>
-        
-        {snoozeEnabled && (
-          <View style={styles.snoozeSettings}>
-            <Text style={styles.sublabel}>Snooze Duration (minutes)</Text>
-            <View style={styles.snoozeDurationContainer}>
-              {SNOOZE_PRESETS.map((duration) => (
-                <Pressable
-                  key={duration}
-                  style={[
-                    styles.durationButton,
-                    snoozeDuration === duration && styles.durationButtonSelected
-                  ]}
-                  onPress={() => {
-                    setSnoozeDuration(duration);
-                    setCustomDuration('');
-                  }}
-                >
-                  <Text style={[
-                    styles.durationButtonText,
-                    snoozeDuration === duration && styles.durationButtonTextSelected
-                  ]}>
-                    {duration}
-                  </Text>
-                </Pressable>
-              ))}
-              <View style={styles.customDurationContainer}>
-                <TextInput
-                  style={styles.customDurationInput}
-                  placeholder="Custom"
-                  value={customDuration}
-                  onChangeText={handleCustomDuration}
-                  keyboardType="number-pad"
-                  maxLength={2}
-                />
-              </View>
-            </View>
+        <Pressable 
+          style={styles.taskRow}
+          onPress={() => {
+            if (snoozeEnabled) {
+              navigation.navigate('SnoozeConfig', {
+                duration: snoozeDuration,
+                onSave: (newDuration: number) => setSnoozeDuration(newDuration)
+              });
+            }
+          }}
+        >
+          <View style={styles.row}>
+            <Text style={styles.label}>Allow Snooze</Text>
+            {snoozeEnabled && (
+              <Text style={styles.taskType}>
+                {snoozeDuration} minutes
+              </Text>
+            )}
+            <Switch 
+              value={snoozeEnabled}
+              onValueChange={setSnoozeEnabled}
+              style={styles.switch}
+            />
           </View>
-        )}
+        </Pressable>
       </View>
+
       <View style={styles.buttonContainer}>
         <Pressable style={styles.saveButton} onPress={handleSave}>
           <Text style={styles.saveButtonText}>Save Alarm</Text>
@@ -353,5 +359,32 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 8,
     textAlign: 'center',
+  },
+  taskConfigButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 12,
+    marginLeft: 12,
+    borderRadius: 8,
+    backgroundColor: '#f0f0f0',
+  },
+  taskRow: {
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#f0f0f0',
+  },
+  taskTitleRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  taskType: {
+    fontSize: 12,
+    marginBottom: 12,
+    color: '#666',
+  },
+  switch: {
+    transform: [{ scaleX: 0.8 }, { scaleY: 0.8 }],
   },
 }); 
