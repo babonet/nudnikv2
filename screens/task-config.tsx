@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, Pressable } from 'react-native';
+import { View, Text, StyleSheet, Pressable, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { TaskType } from '../types/alarm';
 
@@ -20,11 +20,27 @@ const TASK_OPTIONS: { type: TaskType; label: string; icon: string }[] = [
 ];
 
 export const TaskConfigScreen = ({ route, navigation }: Props) => {
-  const { taskType, onSave } = route.params;
+  const [selectedTask, setSelectedTask] = React.useState<TaskType>(route.params.taskType);
+  const { onSave } = route.params;
 
-  const handleSelect = (type: TaskType) => {
-    onSave(type);
-    navigation.goBack();
+  const handleSelect = async (type: TaskType) => {
+    if (type === 'qrCode' || type === 'barCode') {
+      setSelectedTask(type);
+      navigation.navigate('Scanner', {
+        type,
+        onScan: (code: string) => {
+          console.log('[Scanner] Code scanned:', { type, code });
+          onSave(type);
+          Alert.alert('Code Saved', 'This code will be required to disable the alarm', [
+            { text: 'OK', onPress: () => navigation.goBack() }
+          ]);
+        }
+      });
+    } else {
+      setSelectedTask(type);
+      onSave(type);
+      navigation.goBack();
+    }
   };
 
   return (
@@ -35,22 +51,22 @@ export const TaskConfigScreen = ({ route, navigation }: Props) => {
           key={option.type}
           style={[
             styles.optionButton,
-            taskType === option.type && styles.optionButtonSelected
+            selectedTask === option.type && styles.optionButtonSelected
           ]}
           onPress={() => handleSelect(option.type)}
         >
           <Ionicons 
             name={option.icon as any} 
             size={24} 
-            color={taskType === option.type ? '#fff' : '#333'} 
+            color={selectedTask === option.type ? '#fff' : '#333'} 
           />
           <Text style={[
             styles.optionText,
-            taskType === option.type && styles.optionTextSelected
+            selectedTask === option.type && styles.optionTextSelected
           ]}>
             {option.label}
           </Text>
-          {taskType === option.type && (
+          {selectedTask === option.type && (
             <Ionicons name="checkmark" size={24} color="#fff" />
           )}
         </Pressable>

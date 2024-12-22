@@ -18,10 +18,7 @@ export interface Alarm {
   recurrence: {
     days: number[];
   };
-  task: {
-    type: TaskType;
-    difficulty?: 'easy' | 'medium' | 'hard';
-  };
+  task: TaskConfiguration;
   snoozeEnabled: boolean;
   snoozeDuration: number;
   name?: string;

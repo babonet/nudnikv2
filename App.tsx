@@ -12,6 +12,7 @@ import { useEffect } from 'react';
 import  TaskCompletionScreen  from './screens/TaskCompletionScreen';
 import { TaskConfigScreen } from './screens/task-config';
 import { SnoozeConfigScreen } from './screens/snooze-config';
+import { ScannerScreen } from './screens/scanner';
 
 type RootStackParamList = {
   Home: undefined;
@@ -24,6 +25,10 @@ type RootStackParamList = {
   SnoozeConfig: {
     duration: number;
     onSave: (duration: number) => void;
+  };
+  Scanner: {
+    type: 'qrCode' | 'barCode';
+    onScan: (code: string) => void;
   };
 };
 
@@ -107,6 +112,11 @@ const Navigation = () => {
         name="SnoozeConfig" 
         component={SnoozeConfigScreen}
         options={{ title: 'Snooze Duration' }}
+      />
+      <Stack.Screen 
+        name="Scanner" 
+        component={ScannerScreen}
+        options={{ title: 'Scan Code' }}
       />
     </Stack.Navigator>
   );

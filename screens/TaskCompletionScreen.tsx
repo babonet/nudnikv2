@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, Alert } from 'react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { Alarm } from '../types/alarm';
 import * as Notifications from 'expo-notifications';
@@ -7,6 +7,10 @@ import { Pressable } from 'react-native';
 
 type RootStackParamList = {
   TaskCompletion: { alarm: Alarm };
+  Scanner: { 
+    type: 'barCode' | 'qrCode',
+    onScan: (code: string) => void 
+  };
 };
 
 type Props = NativeStackScreenProps<RootStackParamList, 'TaskCompletion'>;
@@ -30,8 +34,21 @@ const TaskCompletionScreen = ({ route, navigation }: Props) => {
   };
 
   const handleCompleteTask = () => {
-    // Logic to verify task completion
-    navigation.goBack();
+    if (alarm.task.type === 'barCode' || alarm.task.type === 'qrCode') {
+      navigation.navigate('Scanner', {
+        type: alarm.task.type,
+        onScan: (scannedCode: string) => {
+          if (scannedCode === alarm.task.code) {
+            navigation.goBack();
+          } else {
+            Alert.alert('Invalid Code', 'The scanned code does not match. Please try again.');
+          }
+        }
+      });
+    } else {
+      // Handle other task types (math, etc.)
+      navigation.goBack();
+    }
   };
 
   return (
